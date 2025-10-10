@@ -178,7 +178,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="hello-word-using-geant4"><a class="header" href="#hello-word-using-geant4">HELLO WORD USING GEANT4</a></h1>
-<p>Popular GEANT4 prefix</p>
+<p>To start coding with Geant 4, we may see this lists, popular prefix, keywords(words), and function/class declarations (prototype).</p>
 <div class="table-wrapper"><table><thead><tr><th>Prefix</th><th>Meaning / Usage</th><th>Example</th></tr></thead><tbody>
 <tr><td><strong>G4</strong></td><td>General</td><td><code>G4Box</code></td></tr>
 <tr><td><strong>G4V</strong></td><td>return Virtual (must be implemented)</td><td><code>G4VPhysicalVolume</code></td></tr>
@@ -189,10 +189,14 @@
 <tr><td><strong>G4Em</strong></td><td>Electromagnetic physics</td><td><code>G4EmProcessOptions</code></td></tr>
 </tbody></table>
 </div>
-<p>this popular words may help to start codding with Geant4.</p>
+<ul>
+<li>keywords:</li>
+</ul>
 <p><code>G4Box</code> <code>G4LogicalVolume</code> <code>G4PVPlacement</code> <code>G4RunManager</code> <code>G4ThreeVector</code> <code>G4VPhysicalVolume</code> <code>Construct</code> <code>G4VUserDetectorConstruction</code> <code>Instance</code> <code>runManager</code> <code>worldBox</code> <code>worldLogic</code></p>
 <p>And may we create others likes: <code>MinimalDetector</code>, <code>air</code>, <code>worldBox</code>, <code>worldLogic</code></p>
-<p>an examples of instances classes.</p>
+<ul>
+<li>an examples of instances classes.</li>
+</ul>
 <pre><code class="language-cpp">#if 0
     new G4Box("World", 1*m, 1*m, 1*m);
     new G4LogicalVolume(box, air, "world");
@@ -254,7 +258,7 @@ new G4PVPlacement(
             0
         );
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="setuserinitializationphysicslist"><a class="header" href="#setuserinitializationphysicslist">SetUserInitialization(physicsList)</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="physicslist"><a class="header" href="#physicslist">physicsList</a></h1>
 <p><code>SetUserInitialization(physicsList)</code> connect the run manager to a concrete physics configuration by registering particles and processes.</p>
 <h3 id="starting-point---reference-physics-list"><a class="header" href="#starting-point---reference-physics-list">Starting point - reference physics list</a></h3>
 <pre><code class="language-cpp">#include "G4PhysListFactory.hh"
@@ -348,6 +352,89 @@ ModularPhysicsList() {
 }
 </code></pre>
 <p>Cuts define the production threshold for secondary particles. Lower cuts increase precision but slow simulation.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="g4nistmanager-class-reference"><a class="header" href="#g4nistmanager-class-reference">G4NistManager Class Reference</a></h2>
+<ul>
+<li><strong>Static Public Functions</strong>
+<ul>
+<li>
+<p>Constructor &amp; Destructor</p>
+</li>
+<li>
+<p>Element Functions (G4Element)</p>
+<ul>
+<li>GetElement (size_t index)</li>
+<li>FindOrBuildElement (G4int Z, G4bool isotopes=true)</li>
+<li>FindOrBuildElement (const G4String &amp;symb, G4bool isotopes=true)</li>
+<li>GetNumberOfElements ()</li>
+<li>GetZ (const G4String &amp;symb)</li>
+<li>GetNistElementNames () const</li>
+</ul>
+</li>
+<li>
+<p>Isotope/Mass/Energy Functions</p>
+<ul>
+<li>GetAtomicMassAmu (const G4String &amp;symb) const</li>
+<li>GetAtomicMassAmu (G4int Z) const</li>
+<li>GetIsotopeMass (G4int Z, G4int N) const</li>
+<li>GetAtomicMass (G4int Z, G4int N) const</li>
+<li>GetTotalElectronBindingEnergy (G4int Z) const</li>
+<li>GetMeanIonisationEnergy (G4int Z) const</li>
+<li>GetIsotopeAbundance (G4int Z, G4int N) const</li>
+<li>GetNistFirstIsotopeN (G4int Z) const</li>
+<li>GetNumberOfNistIsotopes (G4int Z) const</li>
+</ul>
+</li>
+<li>
+<p>Material Functions (G4Material)</p>
+<ul>
+<li>GetMaterial (size_t index)</li>
+<li>GetNumberOfMaterials ()</li>
+<li>GetNistMaterialNames () const</li>
+<li>ListMaterials (const G4String &amp;)</li>
+<li>Find or Build Material
+<ul>
+<li>FindOrBuildMaterial (const G4String &amp;name, ...)</li>
+<li>BuildMaterialWithNewDensity (name, basename, density, temp, pres)</li>
+</ul>
+</li>
+<li>Construct New Material
+<ul>
+<li>ConstructNewMaterial (name, elements, nbAtoms, dens, ...)</li>
+<li>ConstructNewMaterial (name, elements, weight, dens, ...)</li>
+<li>ConstructNewGasMaterial (name, nameNist, temp, pres, ...)</li>
+<li>ConstructNewIdealGasMaterial (name, elements, nbAtoms, ...)</li>
+<li>Deletes materials in G4MaterialTable</li>
+<li>Deletes elements in G4ElementTable</li>
+<li>Deletes isotopes in G4IsotopeTable</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Utility/Printing/Control</p>
+<ul>
+<li>GetVerbose ()</li>
+<li>SetVerbose (G4int)</li>
+<li>PrintElement (G4int Z)</li>
+<li>PrintElement (const G4String &amp;)</li>
+<li>PrintG4Element (const G4String &amp;)</li>
+<li>PrintG4Material (const G4String &amp;)</li>
+</ul>
+</li>
+<li>
+<p>Mathematical Utilities (Z/A)</p>
+<ul>
+<li>GetZ13 (G4double Z)</li>
+<li>GetZ13 (G4int Z)</li>
+<li>GetA27 (G4int Z)</li>
+<li>GetLOGA (G4double A)</li>
+<li>GetLOGA (G4int Z)</li>
+<li>GetLOGZ (G4int Z)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
                     </main>
 
