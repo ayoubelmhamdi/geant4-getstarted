@@ -1,0 +1,12 @@
+[book]
+authors = ["Ayoub EL Mhamdi"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Geant4"
+
+[output.html]
+additional-css = ["custom.css"]
+
+[build]
+create-missing = false
