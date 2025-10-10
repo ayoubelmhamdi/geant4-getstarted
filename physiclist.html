@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Hello world - Geant4</title>
+        <title>physiclist - Geant4</title>
 
 
         <!-- Custom HTML head -->
@@ -176,92 +176,109 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="hello-word-using-geant4"><a class="header" href="#hello-word-using-geant4">HELLO WORD USING GEANT4</a></h1>
-<p>Popular GEANT4 prefix</p>
-<div class="table-wrapper"><table><thead><tr><th>Prefix</th><th>Meaning / Usage</th><th>Example</th></tr></thead><tbody>
-<tr><td><strong>G4</strong></td><td>General</td><td><code>G4Box</code></td></tr>
-<tr><td><strong>G4V</strong></td><td>return Virtual (must be implemented)</td><td><code>G4VPhysicalVolume</code></td></tr>
-<tr><td><strong>G4VPV</strong></td><td>return virtual Physic volume</td><td><code>G4VPVParameterisation</code></td></tr>
-<tr><td><strong>G4UI</strong></td><td>User interface</td><td><code>G4UIcommand</code></td></tr>
-<tr><td><strong>G4Nist</strong></td><td>NIST material database</td><td><code>G4NistManager</code></td></tr>
-<tr><td><strong>G4PV</strong></td><td>Physical volume (placement in space)</td><td><code>G4PVPlacement</code></td></tr>
-<tr><td><strong>G4Em</strong></td><td>Electromagnetic physics</td><td><code>G4EmProcessOptions</code></td></tr>
-</tbody></table>
-</div>
-<p>this popular words may help to start codding with Geant4.</p>
-<p><code>G4Box</code> <code>G4LogicalVolume</code> <code>G4PVPlacement</code> <code>G4RunManager</code> <code>G4ThreeVector</code> <code>G4VPhysicalVolume</code> <code>Construct</code> <code>G4VUserDetectorConstruction</code> <code>Instance</code> <code>runManager</code> <code>worldBox</code> <code>worldLogic</code></p>
-<p>And may we create others likes: <code>MinimalDetector</code>, <code>air</code>, <code>worldBox</code>, <code>worldLogic</code></p>
-<p>an examples of instances classes.</p>
-<pre><code class="language-cpp">#if 0
-    new G4Box("World", 1*m, 1*m, 1*m);
-    new G4LogicalVolume(box, air, "world");
-    new G4PVPlacement(
-            0,                //G4RotationMatrix* pRot,
-            G4ThreeVector(),  //G4ThreeVector&amp; tlate,
-            curentLogical,    //G4LogicalVolume* pCurrentLogical,
-            "World",          //G4String&amp; pName,
-            NULL,             //G4LogicalVolume* pMotherLogical,
-            false,            //G4bool pMany,
-            false,            //G4int  pCopyNo,
-            false             //G4bool pSurfChk = false
-        );
-#endif
-</code></pre>
-<p>this previous instances cames from Geant4 header files, and we listed some of them here to help creating a minimal class:</p>
-<pre><code class="language-cpp">G4NistManager::Instance()-&gt;FindOrBuildMaterial("G4_AIR");
+                        <h1 id="setuserinitializationphysicslist"><a class="header" href="#setuserinitializationphysicslist">SetUserInitialization(physicsList)</a></h1>
+<p><code>SetUserInitialization(physicsList)</code> connect the run manager to a concrete physics configuration by registering particles and processes.</p>
+<h3 id="starting-point---reference-physics-list"><a class="header" href="#starting-point---reference-physics-list">Starting point - reference physics list</a></h3>
+<pre><code class="language-cpp">#include "G4PhysListFactory.hh"
+#include "G4VModularPhysicsList.hh"
 
-new G4Box(
-        const G4String&amp; pName,
-        G4double pX,
-        G4double pY,
-        G4double pZ
-    );
+G4PhysListFactory factory;
+G4VModularPhysicsList* physicsList = factory.GetReferencePhysList("QGSP_BIC_HP");
+runManager-&gt;SetUserInitialization(physicsList);
+</code></pre>
+<p>The factory knows about pre-built reference physics lists like <code>QGSP_BIC_HP</code>, <code>FTFP_BERT</code>, <code>QGSP_BERT</code>. Each name encodes hadronic models and EM options.</p>
+<h3 id="what-happens-inside"><a class="header" href="#what-happens-inside">What happens inside</a></h3>
+<p>When <code>SetUserInitialization</code> is called, Geant4 invokes two methods on the physics list:</p>
+<pre><code class="language-cpp">// called by G4RunManager
+physicsList-&gt;ConstructParticle(); // defines particles: e-, e+, gamma, proton, neutron...
+physicsList-&gt;ConstructProcess();  // assigns processes: ionization, bremsstrahlung, decay...
+</code></pre>
+<p>Reference lists handle both automatically. Transportation gets added to all particles.</p>
+<h3 id="changing-em-option"><a class="header" href="#changing-em-option">Changing EM option</a></h3>
+<pre><code class="language-cpp">G4PhysListFactory factory;
+G4VModularPhysicsList* physicsList = factory.GetReferencePhysList("QGSP_BIC_HP_EMZ");
+runManager-&gt;SetUserInitialization(physicsList);
+</code></pre>
+<p>Appending <code>_EMZ</code> or <code>_EMY</code> replaces the default EM module with alternatives.</p>
+<h3 id="manual-physics-list---starting-minimal"><a class="header" href="#manual-physics-list---starting-minimal">Manual physics list - starting minimal</a></h3>
+<p>Instead of reference lists, inherit from <code>G4VUserPhysicsList</code>:</p>
+<pre><code class="language-cpp">class MinimalPhysicsList : public G4VUserPhysicsList {
+public:
+    MinimalPhysicsList() {}
+    ~MinimalPhysicsList() {}
+    
+    void ConstructParticle() {
+        G4Gamma::Definition();
+        G4Electron::Definition();
+    }
+    
+    void ConstructProcess() {
+        AddTransportation();  // mandatory for all particles
+    }
+};
+</code></pre>
+<p>This builds only gamma and electron with no interactions except transportation.</p>
+<h3 id="add-em-processes-manually"><a class="header" href="#add-em-processes-manually">Add EM processes manually</a></h3>
+<pre><code class="language-cpp">void MinimalPhysicsList::ConstructProcess() {
+    AddTransportation();
+    
+    G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
+    
+    // ionization for electron
+    ph-&gt;RegisterProcess(new G4eIonisation(), G4Electron::Definition());
+    
+    // bremsstrahlung for electron  
+    ph-&gt;RegisterProcess(new G4eBremsstrahlung(), G4Electron::Definition());
+    
+    // Compton scattering for gamma
+    ph-&gt;RegisterProcess(new G4ComptonScattering(), G4Gamma::Definition());
+}
+</code></pre>
+<p><code>G4PhysicsListHelper</code> attaches processes to particle definitions.[2]</p>
+<h3 id="using-modular-physics-list"><a class="header" href="#using-modular-physics-list">Using modular physics list</a></h3>
+<p><code>G4VModularPhysicsList</code> allows registering pre-made physics modules instead of individual processes:</p>
+<pre><code class="language-cpp">#include "G4VModularPhysicsList.hh"
+#include "G4EmStandardPhysics.hh"
+#include "G4DecayPhysics.hh"
 
-new G4LogicalVolume(
-        G4VSolid* pSolid,
-        G4Material* pMaterial,
-        const G4String&amp; name
-    );
+class ModularPhysicsList : public G4VModularPhysicsList {
+public:
+    ModularPhysicsList() {
+        RegisterPhysics(new G4EmStandardPhysics());
+        RegisterPhysics(new G4DecayPhysics());
+    }
+};
+</code></pre>
+<p>Each module handles a category: <code>G4EmStandardPhysics</code> adds all EM processes for leptons and photons, <code>G4DecayPhysics</code> adds decay channels. Transportation is added automatically.</p>
+<h3 id="adding-hadronic-physics-module"><a class="header" href="#adding-hadronic-physics-module">Adding hadronic physics module</a></h3>
+<pre><code class="language-cpp">#include "G4HadronPhysicsQGSP_BIC.hh"
 
-new G4PVPlacement(
-        G4RotationMatrix* pRot,            //G4RotationMatrix* pRot,
-        G4ThreeVector&amp; tlate,              //G4ThreeVector&amp; tlate,
-        G4LogicalVolume* pCurrentLogical,  //G4LogicalVolume* pCurrentLogical,
-        G4String&amp; pName,                   //G4String&amp; pName,
-        G4LogicalVolume* pMotherLogical,   //G4LogicalVolume* pMotherLogical,
-        G4bool pMany,                      //G4bool pMany,
-        G4int  pCopyNo,                    //G4int  pCopyNo,
-        G4bool pSurfChk = false            //G4bool pSurfChk = false;
-    );
+ModularPhysicsList() {
+    RegisterPhysics(new G4EmStandardPhysics());
+    RegisterPhysics(new G4DecayPhysics());
+    RegisterPhysics(new G4HadronPhysicsQGSP_BIC());
+}
 </code></pre>
-<p>we can have a <code>Target</code> in this <code>World</code> by:</p>
-<pre><code class="language-cpp">    G4Material* aluminum = nist-&gt;FindOrBuildMaterial("G4_Al");
-    G4Box* targetBox = new G4Box("Target", 10*cm, 10*cm, 1*cm);
-    G4LogicalVolume* targetLogic = new G4LogicalVolume(targetBox, aluminum, "Target");
+<p><code>G4HadronPhysicsQGSP_BIC</code> adds hadronic interactions for protons, neutrons, pions using specific models (Quark Gluon String Precompound, Binary Cascade).</p>
+<h3 id="setting-production-cuts"><a class="header" href="#setting-production-cuts">Setting production cuts</a></h3>
+<pre><code class="language-cpp">void ModularPhysicsList::SetCuts() {
+    SetCutsWithDefault();  // 1mm default
+    // or
+    SetCutValue(0.1*mm, "gamma");
+    SetCutValue(0.1*mm, "e-");
+    SetCutValue(0.1*mm, "e+");
+}
 </code></pre>
-<p>we can always check the <a href="./references/nist.html"> NIST Reference </a></p>
-<h3 id="add-a-detector---silicon-behind-target"><a class="header" href="#add-a-detector---silicon-behind-target">Add a detector - silicon behind target:</a></h3>
-<pre><code class="language-cpp">    G4Box* detectorBox = new G4Box("Detector", 15*cm, 15*cm, 0.5*cm);
-    G4LogicalVolume* detectorLogic = new G4LogicalVolume(detectorBox, silicon, "Detector");
-    new G4PVPlacement(
-            0,
-            G4ThreeVector(0,0,20*cm),  // 20cm behind target
-            detectorLogic,
-            "Detector", 
-            worldLogic,
-            false,
-            0
-        );
-</code></pre>
+<p>Cuts define the production threshold for secondary particles. Lower cuts increase precision but slow simulation.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-
-                            <a rel="next prefetch" href="physiclist.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="hello-geant4.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
+
 
                         <div style="clear: both"></div>
                     </nav>
@@ -269,10 +286,10 @@ new G4PVPlacement(
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-
-                    <a rel="next prefetch" href="physiclist.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="hello-geant4.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+
             </nav>
 
         </div>
