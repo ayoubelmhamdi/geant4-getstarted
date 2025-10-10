@@ -1,6 +1,6 @@
 # HELLO WORD USING GEANT4
 
-Popular GEANT4 prefix
+To start coding with Geant 4, we may see this lists, popular prefix, keywords(words), and function/class declarations (prototype).
 
 | Prefix        | Meaning / Usage                        | Example                 |
 |---------------|----------------------------------------|-------------------------|
@@ -13,13 +13,13 @@ Popular GEANT4 prefix
 | **G4Em**      | Electromagnetic physics                | `G4EmProcessOptions`    |
 
 
-this popular words may help to start codding with Geant4.
+- keywords:
 
 `G4Box` `G4LogicalVolume` `G4PVPlacement` `G4RunManager` `G4ThreeVector` `G4VPhysicalVolume` `Construct` `G4VUserDetectorConstruction` `Instance` `runManager` `worldBox` `worldLogic`
 
 And may we create others likes: `MinimalDetector`, `air`, `worldBox`, `worldLogic`
 
-an examples of instances classes.
+- an examples of instances classes.
 
 ```cpp
 #if 0

@@ -1,4 +1,4 @@
-# SetUserInitialization(physicsList)
+# physicsList
 
 `SetUserInitialization(physicsList)` connect the run manager to a concrete physics configuration by registering particles and processes.
 
