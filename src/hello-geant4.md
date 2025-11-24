@@ -1,6 +1,20 @@
 # HELLO WORD USING GEANT4
 
-To start coding with Geant 4, we may see this lists, popular prefix, keywords(words), and function/class declarations (prototype).
+assuming the geant4 is installed.
+
+```bash
+G4_ROOT_PATH=/data/projects/third-party/Geant4/Geant4-v11.3.2
+
+g++ --std=c++23 \
+    -I$G4_ROOT_PATH/include/Geant4 \
+    -o main main.cc \
+    -L$G4_ROOT_PATH/lib64 \
+    -Wl,-rpath,$G4_ROOT_PATH/lib64 \
+    -lG4global -lG4ptl
+```
+
+
+look this lists, for some popular prefix, keywords(words), and function/class declarations (prototype).
 
 | Prefix        | Meaning / Usage                        | Example                 |
 |---------------|----------------------------------------|-------------------------|
@@ -15,13 +29,24 @@ To start coding with Geant 4, we may see this lists, popular prefix, keywords(wo
 
 - keywords:
 
-`G4Box` `G4LogicalVolume` `G4PVPlacement` `G4RunManager` `G4ThreeVector` `G4VPhysicalVolume` `Construct` `G4VUserDetectorConstruction` `Instance` `runManager` `worldBox` `worldLogic`
 
 And may we create others likes: `MinimalDetector`, `air`, `worldBox`, `worldLogic`
 
 - an examples of instances classes.
 
 ```cpp
+/* G4Box G4LogicalVolume G4PVPlacement G4RunManager G4ThreeVector
+ * G4VPhysicalVolume Construct G4VUserDetectorConstruction Instance
+ * runManager worldBox worldLogic MinimalDetector air
+ */
+
+#include <print>
+
+
+#include "G4Types.hh"
+#include "globals.hh"
+
+
 #if 0
     new G4Box("World", 1*m, 1*m, 1*m);
     new G4LogicalVolume(box, air, "world");
@@ -36,6 +61,15 @@ And may we create others likes: `MinimalDetector`, `air`, `worldBox`, `worldLogi
             false             //G4bool pSurfChk = false
         );
 #endif
+
+/* Try to creat MinimalDetector class that have:
+ * air, worldBox, worldLogic
+ */
+
+int main(){
+    std::print("Hello world\n");
+    return 0;
+}
 ```
 
 this previous instances cames from Geant4 header files, and we listed some of them here to help creating a minimal class:
